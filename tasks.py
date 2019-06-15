@@ -1,7 +1,7 @@
- from celery import Celery
+from celery import Celery
 
- app = Celery('tasks', broker='amqp://localhost//')
+app = Celery('tasks', broker='amqp://localhost//')
 
- @app.tasks
- def reverse(string)
+@app.tasks
+def reverse(string)
     return string[::-1]
