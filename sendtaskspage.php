@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <script defer src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous">
-    </script>
 </head>
 <body>
     <div>
@@ -18,19 +14,25 @@
         <button id="send">Send</button>
     </div>
 </body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+</script>
 <script>
-    $('#send').off().on('click',function(){
-        $.ajax({
-            method: "POST",
-            url: "/sendtasks.php",
-            data: {
-                args:{},
-                noOfTasks: 1
-            },
-            complete : function(res) {
-                console.log(res);
-            }
-        })
+    $(document).ready(function(){
+        $('#send').off().on('click',function(){
+            $.ajax({
+                method: "POST",
+                url: "/sendtasks.php",
+                data: {
+                    args:{},
+                    noOfTasks: 1
+                },
+                complete : function(res) {
+                    console.log(res);
+                }
+            });
+        });
     });
 </script>
 </html>
