@@ -11,9 +11,9 @@ try
 {
     $connection = new AMQPConnection(
         $CONFIG['host'],    #host - host name where the RabbitMQ server is runing
-        5672,           #port - port number of the service, 5672 is the default
-        'guest',        #user - username to connect to server
-        'guest'         #password
+        $CONFIG['port'],           #port - port number of the service, 5672 is the default
+        $CONFIG['user'],        #user - username to connect to server
+        $CONFIG['password']         #password
         );
 }
 catch(exception $e)
