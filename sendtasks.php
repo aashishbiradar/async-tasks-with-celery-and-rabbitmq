@@ -14,5 +14,5 @@ catch(exception $e)
 {
     print_r($e);
 }
-echo "Success!"
+echo "Success!";
 ?>
