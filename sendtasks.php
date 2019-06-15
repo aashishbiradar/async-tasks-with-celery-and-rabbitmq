@@ -28,7 +28,7 @@ try
     $connection->close();*/
     require_once '../celery-php/vendor/autoload.php';
     $c = new \Celery\Celery($CONFIG['host'], $CONFIG['user'], $CONFIG['password'], $CONFIG['vhost']);
-    $result = $c->PostTask('tasks.reverse', 'fromphp');
+    $result = $c->PostTask('tasks.reverse', array('fromphp'));
 }
 catch(exception $e)
 {
