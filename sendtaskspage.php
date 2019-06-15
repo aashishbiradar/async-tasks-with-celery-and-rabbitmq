@@ -23,7 +23,7 @@
         $('#send').off().on('click',function(){
             $.ajax({
                 method: "POST",
-                url: "/sendtasks.php",
+                url: "/async-tasks-with-celery-and-rabbitmq/sendtasks.php",
                 data: {
                     args:{},
                     noOfTasks: 1
