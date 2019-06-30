@@ -38,3 +38,32 @@ Set Administrator
 ```
 sudo rabbitmqctl set_user_tags username adminstrator
 ```
+
+## Celery Setup
+
+#### Install pip3
+```
+sudo apt install python3-pip
+```
+
+#### Install the virtualenv package
+The virtualenv package is required to create virtual environments. You can install it with pip:
+```
+sudo pip3 install virtualenv
+```
+
+#### Create the virtual environment
+To create a virtual environment, you must specify a path. For example to create one in the local directory called ‘myvenv’, type the following:
+```
+virtualenv myvenv
+```
+#### Activate the virtual environment
+You can activate the python environment by running the following command:
+```
+source myvenv/bin/activate
+```
+
+### Install Celery
+```
+pip3 install celery
+```
