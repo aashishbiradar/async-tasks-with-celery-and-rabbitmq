@@ -78,22 +78,12 @@ $ deactivate
 $ pip3 install celery
 ```
 
-#### Install Celery Flower
-Flower is a web based tool for monitoring and administrating Celery clusters.
-```
-$ pip3 install flower
-```
-
-Launch the server and open http://localhost:5555:
-```
-$ flower --port=5555
-```
 #### Run celery worker
 ```
 $ celery -A tasks worker --loglevel=info
 ```
 
-## Start the Workers as DaemonsPermalink
+## Start the Workers as Daemons
 In a production environment with more than one worker, the workers should be daemonized so that they are started automatically at server startup.
 
 Using sudo, create a new service definition file in /etc/systemd/system/celeryd.service. Change the User and Group properties according to your actual user and group name:
@@ -146,23 +136,72 @@ CELERY_BIN=/home/celery/miniconda3/bin/celery
 ```
 
 #### Create log and pid directories:
-
-sudo mkdir /var/log/celery /var/run/celery
-sudo chown celery:celery /var/log/celery /var/run/celery
+```
+$ sudo mkdir /var/log/celery /var/run/celery
+$ sudo chown celery:celery /var/log/celery /var/run/celery
+```
 
 #### Reload systemctl daemon. You should run this command each time you change the service definition file.
-
-sudo systemctl daemon-reload
+```
+$ sudo systemctl daemon-reload
+```
 
 #### Enable the service to startup at boot:
-
-sudo systemctl enable celeryd
+```
+$ sudo systemctl enable celeryd
+```
 
 #### Start the service
-
-sudo systemctl start celeryd
+```
+$ sudo systemctl start celeryd
+```
 
 #### Check that your workers are running via log files:
+```
+$ cat /var/log/celery/worker1.log
+$ cat /var/log/celery/worker2.log
+```
 
-cat /var/log/celery/worker1.log
-cat /var/log/celery/worker2.log
+## Monitor Celery with Flower
+
+#### Install Celery Flower
+
+Flower is a web based tool for monitoring and administrating Celery clusters.
+```
+$ pip3 install flower
+```
+
+Launch the server and open http://localhost:5555:
+```
+$ flower --port=5555
+```
+## Flower as Daemon
+
+Create a systemd configuration file called flower.service, located in /etc/systemd/system folder.
+
+##### /etc/systemd/system/flower.service
+```
+[Unit]
+Description=Flower Celery Service
+
+[Service]
+User=user
+Group=group
+WorkingDirectory=/var/www/project-working-directory
+ExecStart=/home/user/virtualenv/bin/flower --port=5555
+Restart=on-failure
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### Reload systemd daemon 
+```
+$ sudo systemctl daemon-reload
+```
+
+#### Start a flower daemon
+```
+$ sudo systemctl start flower
+```
