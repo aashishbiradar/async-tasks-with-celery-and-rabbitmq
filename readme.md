@@ -164,14 +164,15 @@ $ cat /var/log/celery/worker2.log
 
 ## Monitor Celery with Flower
 
+Flower is a web based tool for monitoring and administrating Celery clusters.
+
 #### Install Celery Flower
 
-Flower is a web based tool for monitoring and administrating Celery clusters.
 ```
 $ pip3 install flower
 ```
 
-Launch the server and open http://localhost:5555:
+#### Launch the server and open http://localhost:5555:
 ```
 $ flower --port=5555
 ```
