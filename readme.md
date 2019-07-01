@@ -1,6 +1,6 @@
 # Asynchronous Processing with RabbitMQ and Celery
 
-When building web applications, you will inevitably find certain actions that are taking too long and as a result must be pulled out of the http response cycle. These actions can be performed asynchronously with celery.
+When building web applications, you will inevitably find certain actions that are taking too long and as a result must be pulled out of the http response cycle. These actions can be performed asynchronously with rabbitmq and celery.
 
 ## RabbitMQ Setup and Configuration
 
@@ -93,30 +93,76 @@ $ flower --port=5555
 $ celery -A tasks worker --loglevel=info
 ```
 
-## Keep Celery running with Supervisor
+## Start the Workers as DaemonsPermalink
+In a production environment with more than one worker, the workers should be daemonized so that they are started automatically at server startup.
+
+Using sudo, create a new service definition file in /etc/systemd/system/celeryd.service. Change the User and Group properties according to your actual user and group name:
+
+##### /etc/systemd/system/celeryd.service
 ```
-$ pip install supervisor
-$ cd /path/to/your/project
-$ echo_supervisord_conf > supervisord.conf
-```
-Next, just add this section after the [supervisord] section:
-```
-[program:celeryd]
-command=/home/aashish/virtualenvs/yourvenv/bin/celery worker --app=tasks -l info 
-stdout_logfile=/path/to/your/logs/celeryd.log
-stderr_logfile=/path/to/your/logs/celeryd.log
-autostart=true
-autorestart=true
-startsecs=10
-stopwaitsecs=600
+[Unit]
+Description=Celery Service
+After=network.target
+
+[Service]
+Type=forking
+User=celery
+Group=celery
+EnvironmentFile=/etc/default/celeryd
+WorkingDirectory=/home/celery/tasks
+ExecStart=/bin/sh -c '${CELERY_BIN} multi start ${CELERYD_NODES} \
+  -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+  --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+ExecStop=/bin/sh -c '${CELERY_BIN} multi stopwait ${CELERYD_NODES} \
+  --pidfile=${CELERYD_PID_FILE}'
+ExecReload=/bin/sh -c '${CELERY_BIN} multi restart ${CELERYD_NODES} \
+  -A ${CELERY_APP} --pidfile=${CELERYD_PID_FILE} \
+  --logfile=${CELERYD_LOG_FILE} --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+
+[Install]
+WantedBy=multi-user.target
 ```
 
-Just run supervisord in your project directory.
+Create a/etc/default/celeryd configuration file:
+
+##### /etc/default/celeryd
 ```
-$ supervisord
+# The names of the workers. This example create two workers
+CELERYD_NODES="worker1 worker2"
+
+# The name of the Celery App, should be the same as the python file
+# where the Celery tasks are defined
+CELERY_APP="downloaderApp"
+
+# Log and PID directories
+CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+CELERYD_PID_FILE="/var/run/celery/%n.pid"
+
+# Log level
+CELERYD_LOG_LEVEL=INFO
+
+# Path to celery binary, that is in your virtual environment
+CELERY_BIN=/home/celery/miniconda3/bin/celery
 ```
-Then, you can use the supervisorctl command to enter the interactive shell. Type help to get started. You can also execute supervisor command directly:
-```
-$ supervisorctl tail celeryd
-$ supervisorctl restart celeryd
-```
+
+#### Create log and pid directories:
+
+sudo mkdir /var/log/celery /var/run/celery
+sudo chown celery:celery /var/log/celery /var/run/celery
+
+#### Reload systemctl daemon. You should run this command each time you change the service definition file.
+
+sudo systemctl daemon-reload
+
+#### Enable the service to startup at boot:
+
+sudo systemctl enable celeryd
+
+#### Start the service
+
+sudo systemctl start celeryd
+
+#### Check that your workers are running via log files:
+
+cat /var/log/celery/worker1.log
+cat /var/log/celery/worker2.log
