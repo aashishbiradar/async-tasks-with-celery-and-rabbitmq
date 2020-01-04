@@ -36,7 +36,7 @@ $ sudo rabbitmqctl set_permissions -p myvhost username ".*" ".*" ".*"
 
 #### Set Administrator
 ```
-$ sudo rabbitmqctl set_user_tags username adminstrator
+$ sudo rabbitmqctl set_user_tags username administrator
 ```
 #### Enable Management Plugin
 ```
